@@ -10,7 +10,6 @@ import (
 	"elasticsearch/config"
 	"elasticsearch/storage"
 
-	"github.com/casbin/casbin/v2"
 	_ "github.com/golang-migrate/migrate/v4"                   // db automigration
 	_ "github.com/golang-migrate/migrate/v4/database"          // db automigration
 	_ "github.com/golang-migrate/migrate/v4/database/postgres" // db automigration
@@ -92,19 +91,19 @@ func main() {
 
 	strg := storage.New(db, esClient)
 
-	enforcer, err := casbin.NewEnforcer(
-		"config/model.conf",
-		"config/policy.csv",
-	)
-	if err != nil {
-		log.Fatal("failed to init casbin:", err)
-	}
+	// enforcer, err := casbin.NewEnforcer(
+	// 	"config/model.conf",
+	// 	"config/policy.csv",
+	// )
+	// if err != nil {
+	// 	log.Fatal("failed to init casbin:", err)
+	// }
 
 	// Start HTTP server
 	engine := api.New(&api.Handler{
 		Strg: strg,
 		Cfg:  &cfg,
-		Enf:  enforcer,
+		// Enf:  nil,
 	})
 
 	if err = engine.Run(":8080"); err != nil {

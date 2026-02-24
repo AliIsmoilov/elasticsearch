@@ -2,7 +2,6 @@ package repo
 
 import (
 	"context"
-	"time"
 
 	"github.com/lib/pq"
 )
@@ -44,7 +43,7 @@ type Movie struct {
 	Screenwriter pq.StringArray `gorm:"type:text[];column:screenwriter"`
 	Actors       pq.StringArray `gorm:"type:text[];column:actors"`
 	UrlLogo      string         `gorm:"column:url_logo"`
-	CreatedAt    time.Time      `gorm:"column:created_at"`
-	UpdatedAt    time.Time      `gorm:"column:updated_at"`
-	DeletedAt    *time.Time     `gorm:"column:deleted_at"`
+	// CreatedAt    time.Time      `gorm:"column:created_at"`
+	// UpdatedAt    time.Time      `gorm:"column:updated_at"`
+	// DeletedAt    *time.Time     `gorm:"column:deleted_at"`
 }

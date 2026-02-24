@@ -42,8 +42,8 @@ func (r *movieRepo) GetListMovies(ctx context.Context, req repo.GetAllMoviesReq)
 	var count int64
 
 	tx := r.db.WithContext(ctx).
-		Table("movies").
-		Where("deleted_at IS NULL")
+		Table("movies")
+		// Where("deleted_at IS NULL")
 
 	if req.Query != "" {
 		tx = tx.Where("movie ILIKE ?", "%"+req.Query+"%")
