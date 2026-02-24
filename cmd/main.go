@@ -20,6 +20,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	es "github.com/elastic/go-elasticsearch/v8"
 	"gorm.io/gorm/logger"
 )
 
@@ -67,7 +68,29 @@ func main() {
 	}
 	fmt.Println("Connection successfully established with GORM")
 
-	strg := storage.New(db)
+	// create elasticsearch client (optional)
+	esAddr := cfg.Elastic.Addr
+	if envAddr := os.Getenv("ELASTIC_ADDR"); envAddr != "" {
+		esAddr = envAddr
+	}
+	var esClient *es.Client
+	if esAddr != "" {
+		esCfg := es.Config{Addresses: []string{esAddr}}
+		esC, err := es.NewClient(esCfg)
+		if err != nil {
+			log.Println("warning: failed to init elasticsearch client:", err)
+		} else {
+			// optional ping/info
+			if _, err := esC.Info(); err != nil {
+				log.Println("warning: elasticsearch info failed:", err)
+			} else {
+				esClient = esC
+				fmt.Println("Elasticsearch client initialized")
+			}
+		}
+	}
+
+	strg := storage.New(db, esClient)
 
 	enforcer, err := casbin.NewEnforcer(
 		"config/model.conf",

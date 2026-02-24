@@ -32,5 +32,8 @@ func New(h *Handler) *gin.Engine {
 	apiV1.PUT("/movie/:id", handlerV1.UpdateMovie)
 	apiV1.DELETE("/movie/:id", handlerV1.DeleteMovie)
 
+	// elasticsearch-backed search
+	apiV1.GET("/es/movies", handlerV1.SearchMoviesES)
+
 	return engine
 }

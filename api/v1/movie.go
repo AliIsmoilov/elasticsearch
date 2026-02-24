@@ -125,7 +125,50 @@ func (h *handlerV1) GetListMovies(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 
-// small helper
+// SearchMoviesES performs a search using Elasticsearch-backed repo if configured.
+func (h *handlerV1) SearchMoviesES(ctx *gin.Context) {
+	if h.strg.Elastic() == nil {
+		ctx.JSON(http.StatusNotImplemented, gin.H{"error": "elasticsearch not configured"})
+		return
+	}
+
+	limit := ctx.DefaultQuery("limit", "0")
+	page := ctx.DefaultQuery("page", "0")
+	query := ctx.DefaultQuery("query", "")
+
+	limitInt := parseInt32(limit)
+	pageInt := parseInt32(page)
+
+	data, err := h.strg.Elastic().Search(ctx, repo.GetAllMoviesReq{
+		Limit: limitInt,
+		Page:  pageInt,
+		Query: query,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	resp := models.GetMoviesListResp{Count: data.Count}
+	for _, m := range data.Movies {
+		resp.Movies = append(resp.Movies, models.Movie{
+			Id:           m.Id,
+			Rating:       m.Rating,
+			Movie:        m.Movie,
+			Year:         m.Year,
+			Country:      m.Country,
+			RatingBall:   m.RatingBall,
+			Overview:     m.Overview,
+			Director:     m.Director,
+			Screenwriter: []string(m.Screenwriter),
+			Actors:       []string(m.Actors),
+			UrlLogo:      m.UrlLogo,
+		})
+	}
+
+	ctx.JSON(http.StatusOK, resp)
+}
+
 func parseInt32(s string) int32 {
 	if s == "" {
 		return 0

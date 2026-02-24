@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	Postgres PostgresData
+	Elastic  ElasticData
 }
 
 type PostgresData struct {
@@ -15,6 +16,10 @@ type PostgresData struct {
 	Username string
 	Password string
 	DB       string
+}
+
+type ElasticData struct {
+	Addr string
 }
 
 func NewConfig(path string) Config {
@@ -29,6 +34,9 @@ func NewConfig(path string) Config {
 			Username: conf.GetString("POSTGRES_USER"),
 			Password: conf.GetString("POSTGRES_PASSWORD"),
 			DB:       conf.GetString("POSTGRES_DB"),
+		},
+		Elastic: ElasticData{
+			Addr: conf.GetString("ELASTIC_ADDR"),
 		},
 	}
 }
